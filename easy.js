@@ -9,6 +9,14 @@ const questions = [
   "Which depot ran out of salt most often?"
 ];
 
+function parseApiKey(value) {
+  const key = value.replace(/\p{Cf}/gu, "").trim()
+    .replace(/^(?:"([^"]*)"|'([^']*)'|“([^”]*)”|‘([^’]*)’)$/u,
+      (_, ...groups) => groups.slice(0, 4).find(group => group !== undefined).trim());
+  if (!/^[\x21-\x7E]+$/.test(key) || key.includes("...") || /^\*+$/.test(key)) return null;
+  return key;
+}
+
 function referenceAnswer(question, history, clock) {
   if (/\b(mark|record|log)\b.*\btreated\b/i.test(question)) {
     return "No log entry was made. The Duty Engineer records only the approved treatment decision and its reason.";
@@ -77,7 +85,7 @@ function assign(decisions, depots, routes, displayTime) {
   }));
 }
 
-if (typeof module !== "undefined") module.exports = { referenceAnswer, parseDepots, assign, questions };
+if (typeof module !== "undefined") module.exports = { referenceAnswer, parseDepots, assign, questions, parseApiKey };
 else {
   const $ = id => document.getElementById(id);
   const clock = globalThis.WinterClock;
@@ -122,13 +130,15 @@ else {
 
   $("refresh").onclick = () => fetchData().catch(error => { $("status").textContent = error.message; });
   $("save").onclick = () => {
-    const model = $("model").value.trim(), key = $("key").value.trim();
-    if (!/^gemini-[\w.-]+$/.test(model) || !key) {
+    const model = $("model").value.trim();
+    const rawKey = $("key").value;
+    if (!/^gemini-[\w.-]+$/.test(model) || !rawKey.trim()) {
       $("settings-status").textContent = "Enter an enabled Gemini model ID and your key.";
       return;
     }
-    if (!/^[A-Za-z0-9_-]+$/.test(key)) {
-      $("settings-status").textContent = "The key contains unexpected characters. Copy it directly from Google AI Studio using the key’s Copy button, then paste it here.";
+    const key = parseApiKey(rawKey);
+    if (!key) {
+      $("settings-status").textContent = "This looks like a masked key or text containing spaces. Use the Copy key action in Google AI Studio.";
       return;
     }
     credentials = { model, key };
