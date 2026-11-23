@@ -63,7 +63,8 @@ function assign(decisions, depots, routes, displayTime) {
     (a.result.timing.departure ?? Infinity) - (b.result.timing.departure ?? Infinity));
   return Object.fromEntries(ordered.map(({ route, result }) => {
     const team = teams[route.depot];
-    let note = "No departure proposed";
+    let note = result.recommendation === "Decision pending"
+      ? "Pending weather or stock evidence" : "None needed for this forecast";
     if (result.recommendation === "Treatment indicated") {
       const minutes = route.lengthKm * 3;
       const pair = team?.pairs.find(p => Math.max(result.open, p.end) <= result.timing.departure && p.minutes + minutes <= 660);
@@ -99,7 +100,6 @@ else {
   function cell(tr, value) { tr.insertCell().textContent = value; }
   async function fetchData() {
     $("routes").replaceChildren();
-    $("depots").textContent = "";
     $("status").textContent = "Fetching the forecast, depots and plan…";
     const responses = await Promise.all([live.requestUrl(easy.routes), LIVE + "tonight.csv", LIVE + "plan.md"]
       .map(url => fetch(url, { cache: "no-store", signal: AbortSignal.timeout(20000) })));
@@ -110,8 +110,6 @@ else {
     const routes = easy.routes.map(r => ({ ...r, stock: depots[r.depot]?.salt * 100 / capacity[r.depot] }));
     const decisions = live.analyze(forecast, routes, $("night").value);
     const departures = assign(decisions, depots, routes, live.displayTime);
-    $("depots").textContent = Object.entries(depots).map(([name, d]) =>
-      `${name}: ${d.trucks} ready trucks, ${d.salt} t salt${d.salt < 0.3 * capacity[name] ? " (below reorder threshold)" : ""}`).join(" · ");
     for (const { route, result, minAir, wetness } of decisions) {
       const tr = $("routes").insertRow();
       cell(tr, `${route.id} ${route.name} · P${route.priority}`);
@@ -119,6 +117,12 @@ else {
       cell(tr, wetness);
       cell(tr, `${result.recommendation} · soil cutoff ${result.threshold} °C`);
       cell(tr, departures[route.id]);
+      const depot = depots[route.depot];
+      const trucks = depot?.trucks === 0 ? "No ready trucks" :
+        `${depot?.trucks} ready ${depot?.trucks === 1 ? "truck" : "trucks"}`;
+      cell(tr, depot
+        ? `${route.depot} · ${trucks} · ${depot.salt} t salt${depot.salt < 0.3 * capacity[route.depot] ? " (below reorder threshold)" : ""}`
+        : `${route.depot} · Depot data unavailable`);
     }
     const incomplete = decisions.some(r => r.missingHours || r.result.missingSoil || r.missingDew || r.missingRain || r.minAir === null);
     $("status").textContent = `Open-Meteo · ${$("night").value}, 16:00–06:00 Dublin time · fetched ${clock.stamp(Date.now()).replace("T", " ")}${incomplete ? " · Some readings are unavailable" : ""}.`;

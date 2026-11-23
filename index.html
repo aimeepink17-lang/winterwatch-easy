@@ -7,7 +7,7 @@
 <script defer src="data.js"></script>
 <script defer src="clock.js"></script>
 <script defer src="live.js"></script>
-<script defer src="easy.js?v=2"></script>
+<script defer src="easy.js?v=3"></script>
 <main class="frame">
   <header class="section-head"><div><h1>Winter Watch</h1><p>Easy rehearsal · County Cavan winter service</p></div></header>
   <section>
@@ -15,9 +15,8 @@
     <label for="night">Dublin evening date</label> <input type="date" id="night">
     <button id="refresh">Fetch tonight’s data</button>
     <p id="status" role="status">Fetch the forecast to review route recommendations.</p>
-    <p id="depots"></p>
     <div class="table-scroll" tabindex="0" role="region" aria-label="Route decisions">
-    <table><thead><tr><th>Route</th><th>Minimum soil / air</th><th>Wetness</th><th>Recommendation</th><th>Departure or constraint</th></tr></thead>
+    <table><thead><tr><th>Route</th><th>Minimum soil / air</th><th>Wetness</th><th>Recommendation</th><th>Departure</th><th>Depot status</th></tr></thead>
     <tbody id="routes"></tbody></table></div>
     <p>The Duty Engineer approves the decision and records the reason in the night log. Soil temperature is a modelled pavement proxy.</p>
   </section>
