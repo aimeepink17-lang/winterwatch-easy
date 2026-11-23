@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Winter Watch · Easy rehearsal</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="data.js"></script>
+<script defer src="clock.js"></script>
+<script defer src="live.js"></script>
+<script defer src="easy.js"></script>
+<main class="frame">
+  <header class="section-head"><div><h1>Winter Watch</h1><p>Easy rehearsal · County Cavan winter service</p></div></header>
+  <section>
+    <h2>Tonight’s decision</h2>
+    <label for="night">Dublin evening date</label> <input type="date" id="night">
+    <button id="refresh">Fetch tonight’s data</button>
+    <p id="status" role="status">Fetch the forecast to review route recommendations.</p>
+    <p id="depots"></p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Route decisions">
+    <table><thead><tr><th>Route</th><th>Minimum soil / air</th><th>Wetness</th><th>Recommendation</th><th>Departure or constraint</th></tr></thead>
+    <tbody id="routes"></tbody></table></div>
+    <p>The Duty Engineer approves the decision and records the reason in the night log. Soil temperature is a modelled pavement proxy.</p>
+  </section>
+  <section>
+    <h2>Five-winter evidence</h2>
+    <p id="history"></p>
+    <p id="priority-review"></p>
+  </section>
+  <section>
+    <h2>Ask Winter Watch</h2>
+    <details>
+      <summary>Gemini settings</summary>
+      <p>The key stays in memory for this tab and is sent only to Google when you ask a question.</p>
+      <label for="model">Gemini model ID</label> <input id="model" placeholder="Enter an enabled model">
+      <label for="key">API key</label> <input id="key" type="password" autocomplete="off">
+      <button id="save">Save for this tab</button> <button id="forget">Forget key</button>
+      <p><label for="input-rate">EUR per million input tokens</label> <input id="input-rate" type="number" min="0" step="any">
+      <label for="output-rate">EUR per million output tokens</label> <input id="output-rate" type="number" min="0" step="any"></p>
+      <p id="settings-status" role="status"></p>
+    </details>
+    <form id="ask">
+      <p><label for="question">Question for the Duty Engineer’s tool</label></p>
+      <textarea id="question" required rows="2"></textarea>
+      <button type="submit">Ask</button>
+    </form>
+    <p id="answer" role="status"></p><p id="ai"></p><p id="usage"></p>
+  </section>
+  <section>
+    <h2>Benchmark checks</h2>
+    <button id="benchmarks">Run five local checks</button>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Benchmark checks">
+    <table><thead><tr><th>Question</th><th>Expected</th><th>Actual</th><th>Result</th></tr></thead>
+    <tbody id="benchmark-results"></tbody></table></div>
+  </section>
+  <footer>Sources · <a href="https://bdaib-hub.pages.dev/pack/winter-watch-k7p2qm#easy">Easy brief</a> · <a href="https://bdaib-hub.pages.dev/data/winter/history.csv">Guided history</a> · <a href="https://open-meteo.com/en/docs">Open-Meteo forecasts</a></footer>
+</main>
+</html>
